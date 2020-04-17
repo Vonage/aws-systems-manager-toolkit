@@ -1,0 +1,18 @@
+---
+schemaVersion: "2.2"
+description: Document to run command validation on an instance
+parameters:
+  command:
+    type: String
+    description: "(Required) command to run"
+mainSteps:
+  - action: aws:runShellScript
+    name: commandValidate
+    inputs:
+      runCommand:
+        - if {{ command }}
+        - then
+        - exit 1
+        - else
+        - exit 0
+        - fi

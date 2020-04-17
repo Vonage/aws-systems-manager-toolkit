@@ -1,0 +1,18 @@
+---
+schemaVersion: "2.2"
+description: Document to dynamically provision host with new user
+parameters:
+  user:
+    type: String
+    description: "(Required) Username"
+mainSteps:
+  - action: aws:runShellScript
+    name: createUser
+    inputs:
+      runCommand:
+        - if id -u {{ user }} >/dev/null 2>&1; then
+        - echo "User exists"
+        - else
+        - useradd {{ user }}
+        - echo "{{ user }}  ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+        - fi

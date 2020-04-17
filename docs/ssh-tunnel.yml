@@ -1,0 +1,25 @@
+---
+schemaVersion: "2.2"
+description: Document to start ssh tunneling
+parameters:
+  target:
+    type: String
+    description: "(Required) Target instance:port of SSH tunnel"
+    default: "sretools1.ciaaongrqobj.us-east-1.rds.amazonaws.com:5432"
+  port:
+    type: String
+    description: "(Required) Port number on local machine to forward traffic to"
+    default: "12345"
+  user:
+    type: String
+    description: "(Required) User for tunneling"
+    default: "tunneluser"
+mainSteps:
+  - action: aws:runShellScript
+    name: portForward
+    inputs:
+      runCommand:
+        - useradd {{ user }}
+        - su {{ user }} -c "ssh-keygen -t rsa -b 4096 -q -N '' -f ~/.ssh/id_rsa"
+        - su {{ user }} -c "cp ~/.ssh/id_rsa.pub ~/.ssh/authorized_keys"
+        - ssh -N -L {{ port }}:{{ target }} {{ user }}@$HOSTNAME -i /home/{{ user }}/.ssh/id_rsa
