@@ -14,6 +14,8 @@ import logging
 import argparse
 import botocore.exceptions
 import boto3
+import re
+from botocore.exceptions import ClientError
 
 streamHandler = logging.StreamHandler()
 formatter = logging.Formatter(
@@ -60,8 +62,8 @@ def get_ssm_inventory():
                 logger.debug("SSM inventory entity not recognised: %s", entity)
                 continue
 
-        instances = get_instance_details(instances)
-        return instances
+    instances = get_instance_details(instances)
+    return instances
 
     
 def get_instance_details(instances):
@@ -71,26 +73,35 @@ def get_instance_details(instances):
 
     # Add attributes from EC2
     filters = get_filters()
-    paginator = ec2_client.get_paginator('describe_instances')
-    response_iterator = paginator.paginate(InstanceIds=list(instances.keys()), Filters=[filters])
-    for reservations in response_iterator:
-        for reservation in reservations['Reservations']:
-            for instance in reservation['Instances']:
-                instance_id = instance['InstanceId']
-                if not instance_id in instances:
-                    continue
+    try:
+        paginator = ec2_client.get_paginator('describe_instances')
+        response_iterator = paginator.paginate(InstanceIds=list(instances.keys()), Filters=[filters])
+   
+        for reservations in response_iterator:
+            for reservation in reservations['Reservations']:
+                for instance in reservation['Instances']:
+                    instance_id = instance['InstanceId']
+                    if not instance_id in instances:
+                        continue
 
-                # Find instance IPs
-                instances[instance_id]['Addresses'].append(instance.get('PrivateIpAddress', ''))
-                instances[instance_id]['Addresses'].append(instance.get('PublicIpAddress', ''))
+                    # Find instance IPs
+                    instances[instance_id]['Addresses'].append(instance.get('PrivateIpAddress', ''))
+                    instances[instance_id]['Addresses'].append(instance.get('PublicIpAddress', ''))
 
-                # Find instance name from tag Name
-                for tag in instance['Tags']:
-                    if tag['Key'] == 'Name':
-                        instances[instance_id]['InstanceName'] = tag['Value']
+                    # Find instance name from tag Name
+                    for tag in instance['Tags']:
+                        if tag['Key'] == 'Name':
+                            instances[instance_id]['InstanceName'] = tag['Value']
 
-                logger.debug("Updated instance: %s: %r", instance_id, instances[instance_id])
-
+                    logger.debug("Updated instance: %s: %r", instance_id, instances[instance_id])
+    except ClientError as c:
+        # Handle edge case where Instance ID did not have the correct status and does not exist
+        if c.response["Error"]["Code"] == "InvalidInstanceID.NotFound":
+            id = re.search(r"The instance ID '(.*?)' does not exist", c.response["Error"]["Message"]).group(1)
+            del instances[id]
+            return get_instance_details(instances)
+        else:
+            raise Exception(c)
     # Filter instances that do not have a description
     for instance_id in list(instances):
         if not instances[instance_id]['Addresses']:
