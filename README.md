@@ -25,7 +25,11 @@ pip install aws-systems-manager-toolkit
 ## Tools
 * ### ssm-connect
 
-Connects you to an SSM-enabled machine by InstanceID, Hostname, Name Tag, or IP Address. If the create-run-as-user.yml doc is uploaded to the account, will also attempt to create the user you're authenticated as, as well as adding you to the sudoers file. The document is located in docs/create-run-as-user.yml. See: *[AWS Documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html)*.
+Connects you to an SSM-enabled machine by InstanceID, Hostname, Name Tag, or IP Address. 
+
+If the create-run-as-user.yml doc is uploaded to the account, will also attempt to create the user you're authenticated as, as well as adding you to the sudoers file. The document is located in docs/create-run-as-user.yml. See: *[AWS Documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html)*.
+
+This feature is typically used with the *[Run As](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-preferences-run-as.html)* option enabled in Session Manager preferences.  By enabling this and uploading the document you can now log in as your own username vs the generic ssm-user.  This is often helpful for tracking actions in logs.
     
   usage:
   ```
