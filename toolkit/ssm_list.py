@@ -53,7 +53,7 @@ def get_ssm_inventory():
                 instance_id = content['InstanceId']
                 instances.update({instance_id : {
                     "InstanceId": instance_id,
-                    "HostName": content.get("ComputerName"),
+                    "HostName": content.get("ComputerName", ""),
                     "InstanceName": "",
                     "Addresses": []
                     }
