@@ -7,7 +7,7 @@ import toolkit
 # Package meta-data.
 NAME = 'aws-systems-manager-toolkit'
 DESCRIPTION = 'Wrapper tools for AWS Systems Manager'
-URL = ''
+URL = 'https://github.com/vonage/aws-systems-manager-toolkit'
 EMAIL = 'sre@vonage.com'
 AUTHOR = 'Vonage SRE'
 REQUIRES_PYTHON = '>=3.6.0'
