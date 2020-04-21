@@ -1,7 +1,7 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
-## [0.0.3]
+## [0.0.3] - 2020-04-21
 ### Added
 - CHANGELOG.md: Changelog
 ### Updated
