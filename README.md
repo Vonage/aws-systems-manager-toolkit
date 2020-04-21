@@ -131,7 +131,7 @@ Quickly run commands on multiple machines at once and see the output broken down
   ```
 * ### ssm-ssh
 
-Delivers the full functionality of SSH, but removes the requirement of using InstanceID's.  Connect to any machine by using the same results provided by ssm-list. If the create-run-as-user.yml doc is uploaded to the account, will also attempt to create the user you're authenticated as, as well as adding you to the sudoers file. The document is located in docs/create-run-as-user.yml. See: *[AWS Documentation](https://docs.aws.amazon.com/systems-manager/latest/userguide/sysman-ssm-docs.html)*.
+Delivers the full functionality of SSH, but removes the requirement of using InstanceID's.  Connect to any machine by using the same results provided by ssm-list.
 
   usage:
   ```

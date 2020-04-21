@@ -40,7 +40,7 @@ def get_sys_args():
     return parser.parse_known_args()
 
 
-def start_session(arg_list, instance_id):
+def start_session(arg_list):
     ssh_args = f"{arg_list.params} " if arg_list.params else ""
     extra_args = f"--profile {arg_list.profile} " if arg_list.profile else ""
     extra_args += f"--region {arg_list.region} " if arg_list.region else ""
@@ -66,9 +66,6 @@ def start_session(arg_list, instance_id):
     except IOError:
         logger.error(f"File {conf} not accessible")
         quit(1)
-
-    user = get_user()
-    create_user(instance_id, user)
 
     command = f'ssh -F {conf} {ssh_args}'
     logger.debug("Running: %s", command)
@@ -160,7 +157,7 @@ def main():
             else:
                 quit(1)
 
-        res = start_session(args[0], instance)
+        res = start_session(args[0])
 
         if res:
             print(res.decode("utf-8"))
