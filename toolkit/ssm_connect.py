@@ -50,7 +50,7 @@ def start_session(instance_id, profile=None, region=None):
 def main():
     args = parse_args(sys.argv[1:])
     try:
-        instance_id = get_instance(args.instance)
+        instance_id = get_instance(args.instance, args.profile, args.region)
         if not instance_id:
             logger.warning(
                 f"Could not resolve Instance ID for {args.instance}")
