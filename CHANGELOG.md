@@ -1,6 +1,10 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
+## [0.0.4] - 2020-04-27
+### Bugfix
+- ssm-connect: resolve host instance-id based on --region flag
+
 ## [0.0.3] - 2020-04-21
 ### Added
 - CHANGELOG.md: Changelog
