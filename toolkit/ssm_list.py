@@ -35,31 +35,34 @@ def get_ssm_inventory():
     ssm_client = session.client('ssm')
 
     # List instances from SSM
-    paginator = ssm_client.get_paginator('get_inventory')
-    response_iterator = paginator.paginate()
-    for inventory in response_iterator:
-        for entity in inventory["Entities"]:
+    paginator = client.get_paginator('describe_instance_information')
+    response_iterator = paginator.paginate(
+        InstanceInformationFilterList=[
+            {
+                'key': 'PingStatus',
+                'valueSet': [
+                    'Online',
+                ]
+            }
+        ]
+    )
+    for instance_info in response_iterator:
+        for instance in instance_info['InstanceInformationList']:
             try:
-                content = entity['Data']['AWS:InstanceInformation']["Content"][0]
                 # At the moment we only support EC2 Instances
-                assert content["ResourceType"] == "EC2Instance"
-
-                # Ignore Terminated instances
-                if content.get("InstanceStatus") == "Terminated":
-                    logger.debug("Ignoring terminated instance: %s", entity)
-                    continue
+                assert instance["ResourceType"] == "EC2Instance"
 
                 # Add to the list
-                instance_id = content['InstanceId']
+                instance_id = instance['InstanceId']
                 instances.update({instance_id : {
                     "InstanceId": instance_id,
-                    "HostName": content.get("ComputerName", ""),
+                    "HostName": instance.get("ComputerName", ""),
                     "InstanceName": "",
                     "Addresses": []
                     }
                 })
             except (AssertionError, KeyError, ValueError):
-                logger.debug("SSM inventory entity not recognised: %s", entity)
+                logger.debug("SSM inventory entity not recognised: %s", instance)
                 continue
 
     instances = get_instance_details(instances)
