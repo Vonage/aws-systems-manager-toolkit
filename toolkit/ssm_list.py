@@ -35,7 +35,7 @@ def get_ssm_inventory():
     ssm_client = session.client('ssm')
 
     # List instances from SSM
-    paginator = client.get_paginator('describe_instance_information')
+    paginator = ssm_client.get_paginator('describe_instance_information')
     response_iterator = paginator.paginate(
         InstanceInformationFilterList=[
             {
