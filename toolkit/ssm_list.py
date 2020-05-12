@@ -81,8 +81,8 @@ def get_instance_details(instances):
         response_iterator = paginator.paginate(InstanceIds=list(instances.keys()), Filters=[filters])
    
         for reservations in response_iterator:
-            for reservation in reservations['Reservations']:
-                for instance in reservation['Instances']:
+            for reservation in reservations.get('Reservations', []):
+                for instance in reservation.get('Instances',[]):
                     instance_id = instance['InstanceId']
                     if not instance_id in instances:
                         continue
@@ -92,7 +92,7 @@ def get_instance_details(instances):
                     instances[instance_id]['Addresses'].append(instance.get('PublicIpAddress', ''))
 
                     # Find instance name from tag Name
-                    for tag in instance['Tags']:
+                    for tag in instance.get('Tags',[]):
                         if tag['Key'] == 'Name':
                             instances[instance_id]['InstanceName'] = tag['Value']
 
@@ -125,8 +125,8 @@ def get_sys_args():
 def print_list():
     cache_file = os.path.join(os.path.expanduser('~'),'.ssm_inventory_cache')
     inventory  = get_ssm_inventory().values()
-    hostname_len = 0
-    instname_len = 0
+    hostname_len = 1
+    instname_len = 1
 
     if not inventory:
         logger.warning("No instances registered in SSM!")
