@@ -20,13 +20,19 @@ def parse_args(argv):
     """
 
     parser = argparse.ArgumentParser(
-        formatter_class=argparse.RawDescriptionHelpFormatter, add_help=False)
+        formatter_class=argparse.RawDescriptionHelpFormatter, usage=usage(), add_help=False)
     parser.add_argument("instances", nargs='+')
     add_general_parameters(parser)
     add_required_parameters(parser)
     args = parser.parse_args(argv)
 
     return args
+
+
+# Will need to update this every time we modify the params
+def usage():
+    msg = "ssm-run instances [instances ...] [--help] [--profile PROFILE] [--region REGION] --commands COMMANDS [COMMANDS ...]"
+    return msg
 
 
 def add_required_parameters(parser):
