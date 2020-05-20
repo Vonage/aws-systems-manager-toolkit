@@ -82,22 +82,14 @@ def get_command_status(command_id):
     return command_check
 
 
-def wait_for_command(command):
-    response = ssm_send_command(instance_id, "SSMValidate", {
-                                "command": [command]})
-    command_id = response['Command']['CommandId']
-    status = get_command_status(command_id)
-    while len(status['CommandInvocations']) == 0 or status['CommandInvocations'][0]['Status'] not in ["Success", "Failed"]:
-        time.sleep(1)
-        status = get_command_status(command_id)
-    if status['CommandInvocations'][0]['Status'] == "Failed":
-        return False
-    elif status['CommandInvocations'][0]['Status'] == "Success":
-        return True
-    return None
+# Parameter command is a list
+def run_command(command):
+    response = ssm.send_command(InstanceIds=[instance_id], DocumentName="AWS-RunShellScript", Parameters={
+                                "commands": command, "executionTimeout": ["10"]})
+    return response["Command"]["CommandId"]
 
 
-def start_remote_ssh_tunnel(remote):
+def start_remote_ssh_tunnel(remote, region):
     response = ssm.send_command(
         InstanceIds=[instance_id],
         DocumentName='SSHTunnel',
@@ -175,11 +167,15 @@ def main():
     except:
         return
     if args.remote != None:
-        if wait_for_command(f"exec 3<>/dev/tcp/127.0.0.1/{port}"):
-            global command_id
-            command_id = start_remote_ssh_tunnel(args.remote)
-            wait_for_command(
-                f'ps aux | grep "ssh -N -L {port}:{args.remote} tunneluser_{uuid}"')
+        port_in_use_id = run_command([f"! exec 3<>/dev/tcp/127.0.0.1/{port}"])
+        if wait_for_command(ssm, port_in_use_id, instance_id):
+            command_id = start_remote_ssh_tunnel(args.remote, region)
+            command_check_script = ['i=1', f'until exec 3<>/dev/tcp/127.0.0.1/{port} || [ $i -eq 10 ]',
+                                    'do', '((i=i+1))', 'sleep 1', 'done', f'exec 3<>/dev/tcp/127.0.0.1/{port}']
+            port_in_use_id = run_command(command_check_script)
+            if not wait_for_command(ssm, port_in_use_id, instance_id):
+                print("Could not establish remote tunnel")
+                return
         else:
             print(f"Port {port} in use on {instance_id}")
             return
