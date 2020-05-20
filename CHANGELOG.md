@@ -1,6 +1,14 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
+## [0.0.6]
+### Bugfix
+- ssm-port-forward: passing in profile and region into the instance id resolver to honor user input
+- ssm-port-forward: resolve timing issue between remote tunnel establishment and local to target port forwarding
+- ssm-connect: running sudo su - user upon logging in to source bash profile, redirect user to their own home dir, motd, etc
+- ssm-run: fixing help message to show correct positional arg placement
+- ssm-connect/run: use session instatiated by profile/region to create boto3 clients, honors profile/region from user input
+
 ## [0.0.5] - 2020-05-12
 ### Bugfix
 - ssm-list: changing get_inventory call to describe_instance_information to make sure we avoid displaying offline instances
