@@ -10,7 +10,7 @@ import json
 import subprocess
 import sys
 import time
-from common import *
+from .common import *
 from sys import platform
 
 
