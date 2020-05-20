@@ -154,7 +154,7 @@ def setup_globals(target, args):
     global uuid
     global command_id
     ssm = get_ssm_client(args.profile, args.region)
-    instance_id = get_instance(target.split(":")[0])
+    instance_id = get_instance(target.split(":")[0], args.profile, args.region)
     if not instance_id:
         raise Exception("Instance ID not found")
     port = target.split(":")[1]
