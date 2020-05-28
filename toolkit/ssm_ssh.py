@@ -32,11 +32,10 @@ args = None
 # Method uses ArgumentParser to retrieve command-line arguments and display help interface
 def get_sys_args():
     parser = argparse.ArgumentParser(
-        "ssm-ssh [ssh-option]... \n\nAll standard SSH options are available.  See 'man ssh'")
-    parser.add_argument("--region", metavar="REGION",
-                        help="Set / override AWS region")
-    parser.add_argument("--profile", metavar="PROFILE",
-                        help="Configuration profile from ~/.aws/{credentials,config}")
+        "ssm-ssh [ssh-option]... \n\nAll standard SSH options are available.  See 'man ssh'",
+        add_help=False
+    )
+    add_general_parameters(parser)
     return parser.parse_known_args()
 
 
