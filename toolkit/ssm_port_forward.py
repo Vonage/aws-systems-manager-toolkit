@@ -152,7 +152,6 @@ def setup_globals(target, args):
     global instance_id
     global port
     global uuid
-    global command_id
     ssm = get_ssm_client(args.profile, args.region)
     instance_id = get_instance(target.split(":")[0])
     if not instance_id:
@@ -161,7 +160,6 @@ def setup_globals(target, args):
     generated_uuid = str(uuid.uuid4())
     first_half = round(len(generated_uuid)/2)
     uuid = generated_uuid[:first_half]
-    command_id = None
 
 
 def main():
