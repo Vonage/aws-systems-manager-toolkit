@@ -1,5 +1,4 @@
 # Changelog
-
 aws-systems-manager-toolkit Changelog
 
 ## [0.0.6]
@@ -19,7 +18,6 @@ aws-systems-manager-toolkit Changelog
 ## [0.0.3] - 2020-04-21
 ### Added
 - CHANGELOG.md: Changelog
-
 ### Updated
 - README.md: Enhancements to the readme
 - ssm-ssh: Remove create user functionality ssm-ssh will connect as the user specified rather than assumed user
