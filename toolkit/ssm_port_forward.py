@@ -114,8 +114,8 @@ def port_forward(local, profile, region):
     params = f'{{\\"portNumber\\":[\\"{port}\\"],\\"localPortNumber\\":[\\"{local}\\"]}}' if platform in [
         "win32", "win64"] else f'\'{json.dumps({"portNumber": [port], "localPortNumber": [local]})}\''
     extra_args = ""
-    extra_args += f"--profile {profile}" if profile else ""
-    extra_args += f"--region {region}" if region else ""
+    extra_args += f"--profile {profile} " if profile else ""
+    extra_args += f"--region {region} " if region else ""
     command = f'aws ssm start-session --target {instance_id} --document-name AWS-StartPortForwardingSession --parameters {params} {extra_args}'
     subprocess.call(command, shell=True)
 
@@ -172,7 +172,8 @@ def main():
         return
     try:
         setup_globals(args.target, args)
-    except:
+    except Exception as e:
+        print(e)
         return
     if args.remote != None:
         if wait_for_command(f"exec 3<>/dev/tcp/127.0.0.1/{port}"):
