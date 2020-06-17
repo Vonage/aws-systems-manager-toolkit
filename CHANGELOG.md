@@ -1,6 +1,11 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
+## [0.0.5] - 2020-05-12
+### Bugfix
+- ssm-list: changing get_inventory call to describe_instance_information to make sure we avoid displaying offline instances
+- ssm-list: fixing ssm-list to handle when an instance doesn't have tags, or is missing a 'name' tag
+
 ## [0.0.4] - 2020-04-27
 ### Bugfix
 - ssm-connect: resolve host instance-id based on --region flag
