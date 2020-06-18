@@ -14,6 +14,11 @@ from .common import *
 from sys import platform
 
 
+def configure_session_client(profile, region):
+    global session
+    session = boto3.Session(profile_name=profile, region_name=region)
+
+
 def parse_args(argv):
     """
     Parse command line arguments
@@ -29,7 +34,6 @@ def parse_args(argv):
     return args
 
 
-# Will need to update this every time we modify the params
 def usage():
     msg = "ssm-run instances [instances ...] [--help] [--profile PROFILE] [--region REGION] --commands COMMANDS [COMMANDS ...]"
     return msg
@@ -55,8 +59,9 @@ def get_response(command_id):
             return command_check
 
 
-def get_instance_ids(instances):
-    i = [{get_instance(instance): instance} for instance in instances]
+def get_instance_ids(instances, profile, region):
+    i = [{get_instance(instance, profile, region): instance}
+         for instance in instances]
     return {k: v for d in i for k, v in d.items()}
 
 
@@ -68,10 +73,10 @@ def get_command_status(command_id):
 
 def main():
     args = parse_args(sys.argv[1:])
-    region = args.region if args.region else 'us-east-1'
+    configure_session_client(args.profile, args.region)
     global ssm
-    ssm = boto3.client('ssm', region_name=region)
-    instances = get_instance_ids(args.instances)
+    ssm = session.client('ssm')
+    instances = get_instance_ids(args.instances, args.profile, args.region)
     if any(i == None for i in instances):
         return
     response = ssm.send_command(
