@@ -8,14 +8,16 @@
 # Changelog:
 # 2020-03-20 - SRE-1605 - Added command-line argument to filter results by instance tag
 
-import os
-import sys
-import logging
 import argparse
 import botocore.exceptions
-import boto3
-import re
 from botocore.exceptions import ClientError
+import boto3
+from .common import *
+import logging
+import os
+import re
+import sys
+
 
 streamHandler = logging.StreamHandler()
 formatter = logging.Formatter(
@@ -113,11 +115,9 @@ def get_instance_details(instances):
 
 # Method uses ArgumentParser to retrieve command-line arguments and display help interface
 def get_sys_args():
-    parser = argparse.ArgumentParser()
-    #parser.add_argument("-e", metavar="<ENVIRONMENT>", help="Specify AWS Environment: 'qa', 'amz1', or 'dev'")
-    parser.add_argument("--region", metavar="REGION", help="Set / override AWS region")
-    parser.add_argument("--profile", metavar="PROFILE", help="Configuration profile from ~/.aws/{credentials,config}")
+    parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--filters", metavar="FILTERS", nargs='+', help="Filter results using awscli syntax (--filters Name=key,Values=value1,value2 Name=tag:Name,Values=fqdn.domain.com )")
+    add_general_parameters(parser)
     
     return parser.parse_args()
 

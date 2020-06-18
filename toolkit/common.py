@@ -104,29 +104,3 @@ def wait_for_command(ssm, command_id, instance_id):
 def get_status(ssm, command_id, instance_id):
     return ssm.list_command_invocations(
         CommandId=command_id, InstanceId=instance_id, Details=True)
-
-
-__all__.append("create_user")
-
-
-def create_user(instance_id, user):
-    ssm = boto3.client("ssm")
-    try:
-        response = ssm.send_command(InstanceIds=[
-                                    instance_id], DocumentName="CreateRunAsUser", Parameters={"user": [user]})
-        command_id = response["Command"]["CommandId"]
-        if wait_for_command(ssm, command_id, instance_id):
-            return True
-    except ClientError:
-        print("Document does not exist in account. Continuing")
-        return True
-
-
-__all__.append("get_user")
-
-
-def get_user():
-    sts = boto3.client('sts')
-    identity = sts.get_caller_identity()
-    arn = identity['Arn']
-    return str.split(arn, "/")[-1]
