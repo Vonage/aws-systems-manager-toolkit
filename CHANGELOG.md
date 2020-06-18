@@ -1,15 +1,18 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
-## [0.0.6]
+## [0.0.6] - 2020-06-18
+### Updated
+- ssm-list: Added common general parameters for consistency across tools
+- ssm-ssh: Added common general parameters for consistency across tools
 ### Bugfix
 - ssm-connect: running sudo su - user upon logging in to source bash profile, redirect user to their own home dir, motd, etc
 - ssm-connect/run: use session instatiated by profile/region to create boto3 clients, honors profile/region from user input
 - ssm-port-forward: passing in profile and region into the instance id resolver to honor user input
 - ssm-port-forward: resolve timing issue between remote tunnel establishment and local to target port forwarding
-- ssm-port-forward: adding spaces in between extra args (profile and region)
 - ssm-port-forward: print exception when trying to set up global vars
 - ssm-run: fixing help message to show correct positional arg placement
+- ssm-ssh: Fixed functionality on Windows 64bit/32bit
 
 ## [0.0.5] - 2020-05-12
 ### Bugfix
