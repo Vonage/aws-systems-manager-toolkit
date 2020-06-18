@@ -15,6 +15,7 @@ import logging
 import os
 import re
 from .common import *
+import platform
 from subprocess import Popen, PIPE
 
 
@@ -40,19 +41,25 @@ def get_sys_args():
 
 
 def start_session(arg_list):
+    command = None
     ssh_args = f"{arg_list.params} " if arg_list.params else ""
     extra_args = f"--profile {arg_list.profile} " if arg_list.profile else ""
     extra_args += f"--region {arg_list.region} " if arg_list.region else ""
 
     if os.name == 'nt':
         conf = f"{os.environ['USERPROFILE']}\.ssm_ssh_conf"
-        executable = "{}\system32\WindowsPowerShell\{}1.0\powershell.exe".format(
-            os.environ['SYSTEMROOT'], 'v')
+        is_wow64 = (platform.architecture()[0] == '32bit' and 'ProgramFiles(x86)' in os.environ)
+        system32 = os.path.join(os.environ['SystemRoot'], 'Sysnative' if is_wow64 else 'System32')
+        powershell_path = os.path.join(os.environ['SystemRoot'], 'SysWOW64' if is_wow64 else 'System32')
+        executable = os.path.join(powershell_path, 'WindowsPowerShell', 'v1.0', 'powershell.exe')
+        ssh = os.path.join(system32, 'openSSH', 'ssh.exe')
         proxy_command = f"{executable} \"aws {extra_args} ssm start-session --target %h --document-name AWS-StartSSHSession --parameters portNumber=%p\""
+        command = f"{ssh} -F '{conf}' {ssh_args}"
     else:
         conf = os.path.join(os.path.expanduser('~'), '.ssm_ssh_conf')
         executable = "/bin/sh"
         proxy_command = f'sh -c "aws {extra_args} ssm start-session --target %h --document-name AWS-StartSSHSession --parameters \'portNumber=%p\'"'
+        command = f"ssh -F '{conf}' {ssh_args}"
 
     logger.debug(conf)
 
@@ -63,11 +70,11 @@ def start_session(arg_list):
             f.write(f'host i-* mi-*\n')
             f.write(f'\tProxyCommand {proxy_command}')
     except IOError:
-        logger.error(f"File {conf} not accessible")
+        logger.error(f"File '{conf}' not accessible")
         quit(1)
 
-    command = f'ssh -F {conf} {ssh_args}'
     logger.debug("Running: %s", command)
+    logger.debug("Executable environment: %s", executable)
     subproc = Popen([command], executable=executable, shell=True)
     response = subproc.communicate()[1]
 
