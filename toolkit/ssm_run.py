@@ -6,6 +6,8 @@
 
 import argparse
 import boto3
+import botocore.exceptions
+from botocore.exceptions import ClientError
 import json
 import subprocess
 import sys
@@ -76,17 +78,22 @@ def main():
     args = parse_args(sys.argv[1:])
     configure_session_client(args.profile, args.region)
     global ssm
-    ssm = session.client('ssm')
-    instances = get_instance_ids(args.instances, args.profile, args.region)
-    response = ssm.send_command(
-        InstanceIds=list(instances.keys()), DocumentName="AWS-RunShellScript", Parameters={'commands': args.commands})
-    command_id = response["Command"]["CommandId"]
-    command_check = get_response(command_id)
-    print("\n Output\n--------")
-    for ci in command_check["CommandInvocations"]:
-        print(f'{instances[ci["InstanceId"]]} | {ci["InstanceId"]}')
-        for command in ci["CommandPlugins"]:
-            print(command["Output"])
+    try:
+        ssm = session.client('ssm')
+        instances = get_instance_ids(args.instances, args.profile, args.region)
+        response = ssm.send_command(
+            InstanceIds=list(instances.keys()), DocumentName="AWS-RunShellScript", Parameters={'commands': args.commands})
+        command_id = response["Command"]["CommandId"]
+        command_check = get_response(command_id)
+        print("\n Output\n--------")
+        for ci in command_check["CommandInvocations"]:
+            print(f'{instances[ci["InstanceId"]]} | {ci["InstanceId"]}')
+            for command in ci["CommandPlugins"]:
+                print(command["Output"])
+    except (botocore.exceptions.BotoCoreError,
+            botocore.exceptions.ClientError) as e:
+        print(e)
+        quit(1)
 
 
 if __name__ == "__main__":
