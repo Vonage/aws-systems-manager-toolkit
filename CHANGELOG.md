@@ -1,6 +1,11 @@
 # Changelog
 aws-systems-manager-toolkit Changelog
 
+## [0.0.7] - 2020-08-04
+### Bugfix
+- ssm-port-forward: Fixed host key conflict when establishing tunnel through localhost
+- ssm-run: Fixed issue where any invalid instance in the provided list causes exit and doesn't display output of valid instances
+
 ## [0.0.6] - 2020-06-18
 ### Updated
 - ssm-list: Added common general parameters for consistency across tools
