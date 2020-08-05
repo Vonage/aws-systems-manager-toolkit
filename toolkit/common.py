@@ -7,7 +7,6 @@ import boto3
 import logging
 import re
 import time
-from botocore.exceptions import ClientError
 
 __all__ = []
 
@@ -104,3 +103,11 @@ def wait_for_command(ssm, command_id, instance_id):
 def get_status(ssm, command_id, instance_id):
     return ssm.list_command_invocations(
         CommandId=command_id, InstanceId=instance_id, Details=True)
+
+
+__all__.append("get_region")
+
+
+def get_region():
+    session = boto3.session.Session()
+    return session.region_name
