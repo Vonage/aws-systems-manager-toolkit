@@ -89,7 +89,7 @@ Simplifies the port forwarding process.  The following example would expose remo
 This is useful in situations where you have a database like RDS that is not running SSM.  Behind the scenes the script will setup 2 tunnels.  
   
   1) A tunnel from your machine -> jumphost
-  2) A tunnel from jumphost -> RDS
+  2) A tunnel from your machine -> RDS through the jumphost tunnel
 
 In order to create the second tunnel we create a temporary user and pem on the jump host.  When you CTRL+C and end the script the user is also removed.  
   
@@ -98,12 +98,13 @@ NOTE: In situations where internet is lost the temporary user can be left behind
   usage:
   ```
             
-    ~ $ ssm-port-forward --target i-0d14faab9db41ee57:3389 --local 12345 --remote i-0a11abcd1ab0abc01:111
+    ~ $ ssm-port-forward --target i-0d14faab9db41ee57 --local 12345 --remote i-0a11abcd1ab0abc01:111
 
     Starting session with SessionId: user-0c702acdf8f164b7a
     Port 12345 opened for sessionId user-0c702acdf8f164b7a.
+    Connection accepted for session user-0c702acdf8f164b7a.
 
-    ^CTerminate signal received, exiting.
+
     Stopping remote SSH tunnel with Command ID 18bf6db1-7a2b-44bc-901a-ffc07c1868a1
 
 
